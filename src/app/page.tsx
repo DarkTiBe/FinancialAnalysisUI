@@ -327,6 +327,7 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+<<<<<<< HEAD
                   <div className="p-4 rounded-lg border bg-muted/50">
                     <h4 className="font-semibold">Mixed Analyst Ratings</h4>
                     <p className="text-sm text-muted-foreground">Analyst ratings are mixed, with 5 buys, 5 holds, and 3 sells, indicating a lack of consensus on the stock's direction.</p>
@@ -339,6 +340,30 @@ export default function DashboardPage() {
                     <h4 className="font-semibold">Technical vs. Fundamental</h4>
                     <p className="text-sm text-muted-foreground">Technical indicators are bearish (RSI > 70), while fundamental analysis suggests the stock is currently undervalued.</p>
                   </div>
+=======
+                  <p className="text-sm text-muted-foreground">
+                    Enter text from diverse sources to find contradictions, then
+                    click summarize.
+                  </p>
+                  <Textarea
+                    placeholder="Paste contradiction analysis here..."
+                    value={contradictionInput}
+                    onChange={(e) => setContradictionInput(e.target.value)}
+                    rows={6}
+                  />
+                  <Button onClick={handleSummarize} disabled={isSummarizing}>
+                    {isSummarizing && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Summarize
+                  </Button>
+                  {contradictionSummary && (
+                    <div className="mt-4 rounded-lg border bg-muted/50 p-4">
+                      <h4 className="font-semibold">AI Summary:</h4>
+                      <p className="text-sm">{contradictionSummary}</p>
+                    </div>
+                  )}
+>>>>>>> 9798e21 (Next changes are:)
                 </CardContent>
               </Card>
               <Card className="lg:col-span-1">
@@ -348,6 +373,7 @@ export default function DashboardPage() {
                     <span>Confirmations</span>
                   </CardTitle>
                 </CardHeader>
+<<<<<<< HEAD
                 <CardContent className="space-y-4">
                   <div className="p-4 rounded-lg border bg-muted/50">
                     <h4 className="font-semibold">Consistent Revenue Growth</h4>
@@ -361,6 +387,15 @@ export default function DashboardPage() {
                     <h4 className="font-semibold">Strong Balance Sheet</h4>
                     <p className="text-sm text-muted-foreground">The company maintains a strong balance sheet with a low debt-to-equity ratio, indicating financial stability.</p>
                   </div>
+=======
+                <CardContent>
+                  <p>
+                    Key indicators and analyses align, suggesting a consistent
+                    market sentiment. Multiple analysts have upgraded their
+                    ratings, citing strong earnings and positive forward
+                    guidance.
+                  </p>
+>>>>>>> 9798e21 (Next changes are:)
                 </CardContent>
               </Card>
             </div>
@@ -400,4 +435,8 @@ export default function DashboardPage() {
       </Dialog>
     </SidebarProvider>
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 9798e21 (Next changes are:)
