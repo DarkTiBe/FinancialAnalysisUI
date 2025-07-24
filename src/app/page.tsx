@@ -341,7 +341,6 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-
               <Card className="lg:col-span-1">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -402,4 +401,3 @@ export default function DashboardPage() {
     </SidebarProvider>
   );
 }
-    
