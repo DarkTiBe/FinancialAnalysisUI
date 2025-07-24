@@ -222,12 +222,14 @@ export default function DashboardPage() {
             <Button
               onClick={handleGenerateAlerts}
               disabled={isGeneratingAlerts || !contradictionSummary}
+              size="icon"
+              aria-label="Generate Alerts"
             >
-              {isGeneratingAlerts && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {isGeneratingAlerts ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Bell />
               )}
-              <Bell className="mr-2" />
-              Generate Alerts
             </Button>
             <Button onClick={() => setIsDialogOpen(true)}>
               <PlusCircle className="mr-2" />
