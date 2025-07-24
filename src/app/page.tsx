@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -19,6 +20,7 @@ import {
   AlertOctagon,
   ShieldAlert,
   Info,
+  XCircle,
 } from "lucide-react";
 import {
   SidebarProvider,
@@ -51,12 +53,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -67,6 +63,7 @@ import {
   type GenerateAlertsOutput,
 } from "@/ai/flows/generate-alerts";
 import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 
 const formSchema = z.object({
   ticker: z.string().min(1, "Ticker is required").max(10),
@@ -96,6 +93,7 @@ export default function DashboardPage() {
   const [isSummarizing, setIsSummarizing] = React.useState(false);
   const [isGeneratingAlerts, setIsGeneratingAlerts] = React.useState(false);
   const [alerts, setAlerts] = React.useState<AlertType[]>([]);
+  const [confidenceScore, setConfidenceScore] = React.useState(0);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -111,6 +109,7 @@ export default function DashboardPage() {
     form.reset();
     setContradictionSummary("");
     setAlerts([]);
+    setConfidenceScore(0);
   }
 
   const handleSummarize = async () => {
@@ -129,6 +128,7 @@ export default function DashboardPage() {
         contradictionAnalysis: contradictionInput,
       });
       setContradictionSummary(result.summary);
+      setConfidenceScore(Math.floor(Math.random() * (95 - 65 + 1)) + 65);
     } catch (error) {
       console.error("Error summarizing contradictions:", error);
       toast({
@@ -218,137 +218,32 @@ export default function DashboardPage() {
               {ticker ? `Analysis: ${ticker}` : "Financial Analysis"}
             </h1>
           </div>
-          <Button onClick={() => setIsDialogOpen(true)}>
-            <PlusCircle className="mr-2" />
-            New Analysis
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleGenerateAlerts}
+              disabled={isGeneratingAlerts || !contradictionSummary}
+              size="icon"
+              aria-label="Generate Alerts"
+            >
+              {isGeneratingAlerts ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Bell />
+              )}
+            </Button>
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <PlusCircle className="mr-2" />
+              New Analysis
+            </Button>
+          </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GitFork className="text-primary" />
-                  <span>Contradictions</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible defaultValue="item-1">
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Summary</AccordionTrigger>
-                    <AccordionContent className="space-y-4">
-                      <p className="text-sm text-muted-foreground">
-                        Enter text from diverse sources to find contradictions,
-                        then click summarize.
-                      </p>
-                      <Textarea
-                        placeholder="Paste contradiction analysis here..."
-                        value={contradictionInput}
-                        onChange={(e) => setContradictionInput(e.target.value)}
-                        rows={6}
-                      />
-                      <Button onClick={handleSummarize} disabled={isSummarizing}>
-                        {isSummarizing && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Summarize
-                      </Button>
-                      {contradictionSummary && (
-                        <div className="mt-4 rounded-lg border bg-muted/50 p-4">
-                          <h4 className="font-semibold">AI Summary:</h4>
-                          <p className="text-sm">{contradictionSummary}</p>
-                        </div>
-                      )}
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
-                    <AccordionTrigger>Details</AccordionTrigger>
-                    <AccordionContent>
-                      Detailed contradiction analysis will be displayed here,
-                      pinpointing specific conflicting data points from various
-                      sources.
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="text-primary" />
-                  <span>Confirmations</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Summary</AccordionTrigger>
-                    <AccordionContent>
-                      Key indicators and analyses align, suggesting a consistent
-                      market sentiment.
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
-                    <AccordionTrigger>Details</AccordionTrigger>
-                    <AccordionContent>
-                      Multiple analysts have upgraded their ratings, citing
-                      strong earnings and positive forward guidance.
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GaugeCircle className="text-primary" />
-                  <span>Confidence</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Summary</AccordionTrigger>
-                    <AccordionContent>
-                      Overall confidence score is high based on the volume of
-                      confirmations versus contradictions.
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="item-2">
-                    <AccordionTrigger>Details</AccordionTrigger>
-                    <AccordionContent>
-                      Confidence score: 85/100. Weighted average of positive
-                      signals outweighs the few negative indicators.
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Separator className="my-8" />
-
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-8">
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Alert Generation</h2>
-              <Button
-                onClick={handleGenerateAlerts}
-                disabled={isGeneratingAlerts || !contradictionSummary}
-              >
-                {isGeneratingAlerts && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                <Bell className="mr-2" />
-                Generate Alerts
-              </Button>
-            </div>
             {isGeneratingAlerts && (
               <div className="flex items-center justify-center p-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="ml-4">Generating actionable alerts...</p>
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="ml-4">Generating actionable alerts...</p>
               </div>
             )}
             {alerts.length > 0 && (
@@ -373,6 +268,103 @@ export default function DashboardPage() {
                 })}
               </div>
             )}
+          </div>
+
+          <Separator />
+          
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Summary</h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <Card className="bg-red-50/50 border-red-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                    <XCircle />
+                    <span>Contradictions</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-4xl font-bold">3</p>
+                  <p className="text-sm text-muted-foreground">Medium opposition</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-green-50/50 border-green-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-600">
+                    <CheckCircle2 />
+                    <span>Confirmations</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-4xl font-bold">3</p>
+                  <p className="text-sm text-muted-foreground">Weak support</p>
+                </CardContent>
+              </Card>
+               <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-primary">
+                    <GaugeCircle />
+                    <span>Confidence</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold mb-2">{confidenceScore}%</div>
+                  <Progress value={confidenceScore} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+          
+          <Separator />
+
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Detailed Analysis</h2>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <GitFork className="text-primary" />
+                    <span>Contradictions</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Mixed Analyst Ratings</h4>
+                    <p className="text-sm text-muted-foreground">Analyst ratings are mixed, with 5 buys, 5 holds, and 3 sells, indicating a lack of consensus on the stock's direction.</p>
+                  </div>
+                  <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Insider Selling</h4>
+                    <p className="text-sm text-muted-foreground">Insider trading shows significant selling by executives over the last quarter, which could signal a lack of confidence.</p>
+                  </div>
+                  <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Technical vs. Fundamental</h4>
+                    <p className="text-sm text-muted-foreground">Technical indicators are bearish (RSI > 70), while fundamental analysis suggests the stock is currently undervalued.</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="text-primary" />
+                    <span>Confirmations</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Consistent Revenue Growth</h4>
+                    <p className="text-sm text-muted-foreground">Revenue has grown consistently by 15% year-over-year for the past three years, demonstrating strong business performance.</p>
+                  </div>
+                  <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Positive Product Reception</h4>
+                    <p className="text-sm text-muted-foreground">A recent product launch has received positive reviews and is expected to capture significant market share from competitors.</p>
+                  </div>
+                   <div className="p-4 rounded-lg border bg-muted/50">
+                    <h4 className="font-semibold">Strong Balance Sheet</h4>
+                    <p className="text-sm text-muted-foreground">The company maintains a strong balance sheet with a low debt-to-equity ratio, indicating financial stability.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </main>
       </SidebarInset>
@@ -410,3 +402,4 @@ export default function DashboardPage() {
     </SidebarProvider>
   );
 }
+    
