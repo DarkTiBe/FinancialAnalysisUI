@@ -177,7 +177,7 @@ export default function DashboardPage() {
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Bot className="size-8 text-primary" />
-            <span className="text-lg font-semibold">TradeSage AI</span>
+            <span className="text-lg font-semibold">Financial Analysis AI</span>
           </div>
         </SidebarHeader>
         <SidebarContent>

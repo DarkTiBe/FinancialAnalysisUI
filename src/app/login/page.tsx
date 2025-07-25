@@ -7,7 +7,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center">
           <Bot className="h-16 w-16 text-primary" />
-          <h1 className="mt-4 text-4xl font-bold text-center">TradeSage AI</h1>
+          <h1 className="mt-4 text-4xl font-bold text-center">Financial Analysis AI</h1>
           <p className="mt-2 text-center text-muted-foreground">
             Welcome back! Please sign in to your account.
           </p>

@@ -1,4 +1,4 @@
-# **App Name**: TradeSage AI
+# **App Name**: Financial Analysis AI
 
 ## Core Features:
 
