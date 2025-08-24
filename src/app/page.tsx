@@ -195,7 +195,7 @@ export default function DashboardPage() {
   return (
     <SidebarProvider>
       <div className="flex h-screen">
-        <Sidebar className="w-1/3">
+        <Sidebar>
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <Bot className="size-8 text-primary" />
@@ -205,9 +205,9 @@ export default function DashboardPage() {
           <SidebarContent>
             <Card className="flex-grow flex flex-col">
               <CardContent className="flex-grow overflow-y-auto">
-                <div className="space-y-4">
+                <div className="space-y-4 mt-4">
                   <div className="flex items-start gap-2">
-                    <Bot className="w-6 h-6 text-primary" />
+                    <Bot className="w-20 h-20 text-primary" />
                     <div className="bg-muted rounded-lg p-3">
                       <p>Hello! I'm a financial analysis AI agent. Please provide the name of the company, the ticker symbol of the stock you wish to analyze, or a hypothesis theory.</p>
                     </div>
@@ -238,7 +238,6 @@ export default function DashboardPage() {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-
         <SidebarInset className="flex-grow">
           <header className="flex items-center justify-between border-b p-4">
             <div className="flex items-center gap-4">
