@@ -64,6 +64,10 @@ import {
 } from "@/ai/flows/generate-alerts";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "./auth-context";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 const formSchema = z.object({
   ticker: z.string().min(1, "Ticker is required").max(10),
@@ -86,6 +90,8 @@ const severityColors: Record<AlertType["severity"], string> = {
 };
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [ticker, setTicker] = React.useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [contradictionInput, setContradictionInput] = React.useState("");
@@ -102,6 +108,20 @@ export default function DashboardPage() {
       ticker: "",
     },
   });
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setTicker(values.ticker.toUpperCase());
@@ -171,6 +191,16 @@ export default function DashboardPage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: "Signed out successfully!" });
+      router.push("/login");
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    }
+  };
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -183,25 +213,17 @@ export default function DashboardPage() {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton isActive>
-                <LayoutDashboard />
-                <span>Dashboard</span>
+              <SidebarMenuButton onClick={() => setIsDialogOpen(true)}>
+                <PlusCircle className="mr-2" />
+                New Analysis
               </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <Link href="/login">
-                <SidebarMenuButton>
-                  <LogIn />
-                  <span>Login Page</span>
-                </SidebarMenuButton>
-              </Link>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton>
+              <SidebarMenuButton onClick={handleLogout}>
                 <LogOut />
                 <span>Log out</span>
               </SidebarMenuButton>
@@ -230,10 +252,6 @@ export default function DashboardPage() {
               ) : (
                 <Bell />
               )}
-            </Button>
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <PlusCircle className="mr-2" />
-              New Analysis
             </Button>
           </div>
         </header>

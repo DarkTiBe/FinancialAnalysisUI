@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { auth } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -26,6 +31,9 @@ const formSchema = z.object({
 });
 
 export default function AuthForm() {
+  const [isLogin, setIsLogin] = useState(true);
+  const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,21 +42,41 @@ export default function AuthForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // NOTE: Firebase authentication logic would go here.
-    console.log(values);
-    alert("Login functionality is not implemented in this demo.");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (isLogin) {
+      try {
+        await signInWithEmailAndPassword(auth, values.email, values.password);
+        toast({ title: "Logged in successfully!" });
+        router.push("/");
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Error", description: error.message });
+      }
+    } else {
+      try {
+        await createUserWithEmailAndPassword(auth, values.email, values.password);
+        toast({ title: "Account created successfully!" });
+        router.push("/");
+      } catch (error: any) {
+        toast({ variant: "destructive", title: "Error", description: error.message });
+      }
+    }
   }
   
-  const handleGoogleSignIn = () => {
-    // NOTE: Firebase Google Sign-In logic would go here.
-    alert("Google Sign-In is not implemented in this demo.");
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({ title: "Logged in with Google successfully!" });
+      router.push("/");
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    }
   }
 
   return (
     <Card className="shadow-2xl">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
+        <CardTitle>{isLogin ? "Login" : "Sign Up"}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -80,7 +108,7 @@ export default function AuthForm() {
               )}
             />
             <Button type="submit" className="w-full">
-              Sign In
+              {isLogin ? "Login" : "Sign Up"}
             </Button>
           </form>
         </Form>
@@ -106,7 +134,10 @@ export default function AuthForm() {
               d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 256S109.8 0 244 0c73.2 0 136 29.1 182.4 75.4l-72.3 69.3c-23.7-22.5-55.4-36.4-90.1-36.4-69.3 0-126.3 57.2-126.3 127.3s57 127.3 126.3 127.3c76.3 0 110.1-53.1 113.8-82.1H244v-90.9h244z"
             ></path>
           </svg>
-          Sign in with Google
+          Login with Google
+        </Button>
+        <Button variant="link" onClick={() => setIsLogin(!isLogin)} className="w-full mt-4">
+          {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
         </Button>
       </CardContent>
     </Card>
